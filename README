@@ -1,0 +1,53 @@
+ActiveDirectoryAuth
+===================
+
+Lets you authenticate users against an ActiveDirectory systems, also provides a test implementation so you don't need to have an LDAP server when developing.  The goal here is to allow you to store your user information in your local database, but use the LDAP information for authentication and retrieving authorization information.
+
+This will add an 'authenticate' method to your model which works as follows:
+
+  @user = User.authenticate("koz", "mypassword") # returns the user
+  @user = User.authenticate("who knows", "not a password") # nil
+
+In order to map from the ldap result to your database, you need to implement a find_from_ldap method on the user class.  It will be passed an ldap user, which responds to a few key methods.  +username+ returns the account name that successfully authenticated.  +roles+ returns the list of configured group which the user is a member of.  It also adds some simple predicate methods for each of the available roles.  For example:
+
+  def self.find_from_ldap(ldap_user)
+    returning find_or_create_by_login(ldap_user.username) do |user|
+      user.permissions.clear
+      if ldap_user.admin?
+        user.admin = true
+      end
+      if ldap_user.printer_operator?
+        user.permissions.create! :code=>"printer"
+      end
+      user.save!
+    end
+  end
+
+There's obviously a risk that users who have been disabled in ldap could still have an active session in the rails application.  
+
+Example
+=======
+
+in production.rb you can write:
+
+User.authenticates_with_active_directory do |config|
+  config.host    = "ldap.example.com"
+  config.base_dn = "DC=example,DC=com"
+  # Only needed if your ldap server doesn't support anonymous binding
+  config.administrator_dn = "CN=administrator,OU=Administrators Group,OU=Systems"
+  config.administrator_password = "admin"
+
+  config.roles :printer_operator => "CN=Printer Operators,CN=Groups",
+               :backup_operator  => "CN=Backup Operators,CN=Groups",
+               :admin            => "CN=Administrators,CN=Groups"
+end
+
+then in development.rb
+
+User.stub_active_directory_authentication do |config|
+  config.user "koz", "a password", :printer_operator, :backup_operator
+  config.user "dhh", "anotherpassword", :admin
+end
+
+
+Copyright (c) 2009 Koziarski Software Ltd, released under the MIT license
