@@ -34,11 +34,11 @@ module ActiveDirectoryAuth
         ad_user = results.first
         Rails.logger.info "Successfully bound as #{username.inspect}"
         Rails.logger.info "Found #{ad_user.inspect}"
-        @clazz.find_from_ldap(LdapUser.new(ad_user.samaccountname, map_roles(ad_user.memberOf)))
+        @clazz.find_from_ldap(LdapUser.new(ad_user.samaccountname.first, map_roles(ad_user.memberOf)))
       else
         Rails.logger.info "Failed to bind as #{username.inspect} Error: #{ldap.get_operation_result.inspect}"
         nil
-      end  
+      end
     end
     
     def new_ldap_connection
@@ -71,7 +71,7 @@ module ActiveDirectoryAuth
     
     def authenticate(username, password)
       if (user = @credentials[username]) && user.password == password
-        return @clazz.find_from_ldap(ad_user)
+        return @clazz.find_from_ldap(user)
       else
         return nil
       end
@@ -94,7 +94,6 @@ module ActiveDirectoryAuth
       end
     end
   end
-  
   
   class StubUser < LdapUser
     attr_reader :password

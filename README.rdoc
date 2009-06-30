@@ -1,5 +1,4 @@
-ActiveDirectoryAuth
-===================
+= ActiveDirectoryAuth
 
 Lets you authenticate users against an ActiveDirectory systems, also provides a test implementation so you don't need to have an LDAP server when developing.  The goal here is to allow you to store your user information in your local database, but use the LDAP information for authentication and retrieving authorization information.
 
@@ -25,29 +24,33 @@ In order to map from the ldap result to your database, you need to implement a f
 
 There's obviously a risk that users who have been disabled in ldap could still have an active session in the rails application.  
 
-Example
-=======
+== Example
 
-in production.rb you can write:
+In production.rb you can write:
 
-User.authenticates_with_active_directory do |config|
-  config.host    = "ldap.example.com"
-  config.base_dn = "DC=example,DC=com"
-  # Only needed if your ldap server doesn't support anonymous binding
-  config.administrator_dn = "CN=administrator,OU=Administrators Group,OU=Systems"
-  config.administrator_password = "admin"
+  config.to_prepare do
+    User.authenticates_with_active_directory do |config|
+      config.host    = "1.2.3.4"
+      config.base_dn = "DC=radionz,DC=co,DC=nz"
 
-  config.roles :printer_operator => "CN=Printer Operators,CN=Groups",
-               :backup_operator  => "CN=Backup Operators,CN=Groups",
-               :admin            => "CN=Administrators,CN=Groups"
-end
+      # Only needed if your ldap server doesn't support anonymous binding
+      config.administrator_dn = "CN=administrator,OU=Sysadmins Group,OU=Systems"
+      config.administrator_password = "admin_pw"
 
-then in development.rb
+      config.roles :printer_operator => "CN=Printer Operators,CN=Groups",
+                   :backup_operator  => "CN=Backup Operators,CN=Groups",
+                   :admin            => "CN=AdminUsers,OU=Groups,OU=Corporate",
+                   :operators        => "CN=OperatorsGroup,OU=Groups,OU=Corporate"
+    end
+  end
 
-User.stub_active_directory_authentication do |config|
-  config.user "koz", "a password", :printer_operator, :backup_operator
-  config.user "dhh", "anotherpassword", :admin
-end
+then in development.rb and test.rb you write:
 
+  User.stub_active_directory_authentication do |config|
+    config.user "koz", "a password", :printer_operator, :backup_operator
+    config.user "dhh", "anotherpassword", :admin
+  end
+
+Note: the config.to_prepare block is used, as Ruby is garbage collecting the User's config settings. 
 
 Copyright (c) 2009 Koziarski Software Ltd, released under the MIT license
