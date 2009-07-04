@@ -53,4 +53,12 @@ then in development.rb and test.rb you write:
 
 Note: the config.to_prepare block is used, as Ruby is garbage collecting the User's config settings. 
 
-Copyright (c) 2009 Koziarski Software Ltd, released under the MIT license
+
+== Copyright & Credits
+
+This plugin was funded by Radio New Zealand Limited, and written by Michael Koziarski.
+
+Copyright (c) 2009 Koziarski Software Ltd
+Copyright (c) 2009 Radio New Zealand Limited
+
+Released under the MIT license
