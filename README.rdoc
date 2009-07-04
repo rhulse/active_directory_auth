@@ -24,6 +24,16 @@ In order to map from the ldap result to your database, you need to implement a f
 
 There's obviously a risk that users who have been disabled in ldap could still have an active session in the rails application.  
 
+== Requirements
+
+You need the net/ldap gem. You should add a line in your config/enviornment.rb file:
+
+  config.gem "ruby-net-ldap", :lib => "net/ldap", :source => "http://gems.github.com"
+
+Optionally, you could unpack this gem into your vendor/gems directory with this command:
+
+  rake gems:unpack
+
 == Example
 
 In production.rb you can write:
