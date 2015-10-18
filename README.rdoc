@@ -22,7 +22,7 @@ In order to map from the ldap result to your database, you need to implement a f
     end
   end
 
-There's obviously a risk that users who have been disabled in ldap could still have an active session in the rails application.  
+There's obviously a risk that users who have been disabled in ldap could still have an active session in the rails application.
 
 == Requirements
 
@@ -33,6 +33,18 @@ You need the net/ldap gem. You should add a line in your config/enviornment.rb f
 Optionally, you could unpack this gem into your vendor/gems directory with this command:
 
   rake gems:unpack
+
+== Install
+
+Rails 2.x
+Run command
+
+  script/plugin install git@github.com:rhulse/active_directory_auth.git
+
+Rails 3.2 +
+Add gem to your Gemfile
+
+  gem "active_directory_auth", git: "https://github.com/josecoelho/active_directory_auth.git"
 
 == Example
 
@@ -61,7 +73,7 @@ then in development.rb and test.rb you write:
     config.user "dhh", "anotherpassword", :admin
   end
 
-Note: the config.to_prepare block is used, as Ruby is garbage collecting the User's config settings. 
+Note: the config.to_prepare block is used, as Ruby is garbage collecting the User's config settings.
 
 
 == Copyright & Credits
