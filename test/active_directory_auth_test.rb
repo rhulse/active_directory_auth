@@ -31,7 +31,7 @@ class ActiveDirectoryAuthTest < ActiveSupport::TestCase
 
     @ldap_connection.expects(:host=).with("ldap.example.com")
     @ldap_connection.expects(:auth).with('CN=administrator,OU=Administrators Group,OU=Systems,DC=example,DC=com', 'admin')
-    @ldap_connection.expects(:binds_as).
+    @ldap_connection.expects(:bind_as).
         with(:base => 'DC=example,DC=com',
              :filter => @criteria,
              :attributes => ['dn', 'sAMAccountName', 'displayname', 'SN', 'givenName', 'memberOf', 'mail'],
